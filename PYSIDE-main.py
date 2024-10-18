@@ -2,7 +2,6 @@ from PySide6.QtWidgets import QApplication, QMainWindow
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QCursor, QPixmap
 from Ui_main import Ui_Form
-import pyperclip
 
 
 class MainWindow(QMainWindow, Ui_Form):
