@@ -1,5 +1,5 @@
 [app]
-title = pyside_app_demo
+title = MC_Map_Treversal
 project_dir = ./
 input_file = src/PySide_main.py
 exec_directory = dist/
@@ -8,7 +8,7 @@ icon = res/favicon.ico
 
 [python]
 python_path = python
-packages = Nuitka==2.4.8
+packages = Nuitka
 android_packages = buildozer==1.5.0,cython==0.29.33
 
 [qt]

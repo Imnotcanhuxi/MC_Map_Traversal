@@ -1,0 +1,76 @@
+name: Build and Release
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12.x"
+          check-latest: true
+          cache: "pip"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install -r requirements.txt
+
+      - name: Build
+        run: |
+          python -m pip install nuitka
+          nuitka --onefile --script-name="src/PySide_main.py" --enable-plugins=pyside6 --output-dir="dist" --output-file="MC_Map_Traversal" --assume-yes-for-downloads --windows-console-mode=disable --windows-icon-from-ico="res/favicon.ico"
+
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows
+          path: dist/MC_Map_Traversal.exe
+
+  prerelease:
+    permissions:
+      contents: write
+    needs: build-windows
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Download
+        uses: actions/download-artifact@v4
+
+      - name: Create notes
+        run: git log --pretty=format:"* %h %s by @%an" "$(git tag -l --column "v*" | head -1)..HEAD" > body.txt
+
+      - name: delete Alpha
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if
+            gh release view Alpha
+          then
+            gh release delete Alpha
+          fi
+          if
+            git tag -d Alpha
+          then
+            git push origin :refs/tags/Alpha
+          fi
+
+      - name: Prerelease
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: Alpha
+          prerelease: true
+          body_path: body.txt
+          files: |
+            windows/MC_Map_Traversal.exe
