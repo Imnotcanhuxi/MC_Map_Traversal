@@ -1,6 +1,6 @@
+# from PySide6 import Qt
 from PySide6.QtWidgets import QApplication, QMainWindow
-from PySide6.QtCore import Qt
-from PySide6.QtGui import QCursor, QPixmap
+from PySide6.QtGui import QGuiApplication
 from Ui_main import Ui_Form
 
 
@@ -326,7 +326,7 @@ class MainWindow(QMainWindow, Ui_Form):
             self.plainTextEdit.appendPlainText(
                 f"生成完成!已复制到你的剪切板!\n累计生成{len(text)}字符\n总地图画数量:{num}\n总像素:{num*128*128}\n范围:{map_id}~{map_id+num-1}"
             )
-            pyperclip.copy(text)
+            QGuiApplication.clipboard().setText(text)
             self.inputEdit.clear()
 
         self.plainTextEdit.appendPlainText(
